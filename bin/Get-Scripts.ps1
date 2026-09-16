@@ -32,7 +32,7 @@
     The base directory where scripts will be saved. Defaults to the current directory.
 
 .PARAMETER EnvFilePath
-    Path to the .env file containing API credentials. Defaults to '.env' in the same directory as the script.
+    Path to the .env file containing API credentials. Defaults to '.env' in the repository root.
 
 .PARAMETER IncludeDisabled
     Include disabled scripts in the sync. By default, only active/enabled scripts are synced.
@@ -50,11 +50,12 @@
     Outputs status messages and saves scripts to disk in OSType\Language folder structure.
 
 .NOTES
-    Version: 1.0.0
+    Version: 1.1.0
     Author: NinjaOne Scripts Project
     Created: 2026-02-20
     
     Version History:
+    1.1.0 - 2026-09-15 - Changed the default .env path to the repository root and return an explicit success exit code.
     1.0.0 - 2026-02-20 - Initial release
 
 .LINK
@@ -90,7 +91,7 @@ param(
     [String]$OutputPath = (Get-Location).Path,
     
     [Parameter()]
-    [String]$EnvFilePath = (Join-Path -Path $PSScriptRoot -ChildPath ".env"),
+    [String]$EnvFilePath = (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath ".env"),
     
     [Parameter()]
     [Switch]$IncludeDisabled,
@@ -902,4 +903,5 @@ $(
 
 end {
     Write-Host "`nSync completed." -ForegroundColor Cyan
+    exit 0
 }
