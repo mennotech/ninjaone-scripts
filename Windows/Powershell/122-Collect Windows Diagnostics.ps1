@@ -4,7 +4,7 @@
 #
 # Description:
 #   Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\ProgramData by default.
-#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, and OutputDirectory can override the matching command-line parameters. Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).
+#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, and ExtensiveTest can override the matching command-line parameters.
 #
 # Metadata:
 #   - NinjaOne Script ID: 122
@@ -13,17 +13,17 @@
 #   - Architecture: 64, 32
 #   - Created By: Roland Penner
 #   - Created On: 2026-08-25
-#   - Last Updated By: Roland Penner
-#   - Last Updated: 2026-08-25 22:11:26
+#   - Last Updated By: Roland Admin
+#   - Last Updated: 2026-09-16 03:42:20
 #   - Active: True
-## Script Variables (NinjaOne):
+# Script Variables (NinjaOne):
 #   - lookbackhours (INTEGER, Optional): Number of hours of time-based diagnostic data to collect. Defaults to 24.
 #   - outputdirectory (TEXT, Optional): Directory in which the diagnostic ZIP archive is created.
 #   - samplingseconds (INTEGER, Optional): Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).
+#   - extensiveTest (CHECKBOX, Optional): Collect per-processor counters, a WPR CPU trace, and additional native event logs.
+#     Default: false
 #
 # ==============================================================================
-#Requires -Version 5.1
-
 <#
 .SYNOPSIS
     Collects Windows diagnostic information and saves it as a ZIP archive.
@@ -33,8 +33,9 @@
     and Windows event log information. Time-based data defaults to the previous
     24 hours. The output is written beneath C:\ProgramData by default.
 
-    NinjaRMM script form variables named LookbackHours, SamplingSeconds, and
-    OutputDirectory can override the matching command-line parameters.
+    NinjaRMM script form variables named LookbackHours, SamplingSeconds,
+    OutputDirectory, and ExtensiveTest can override the matching command-line
+    parameters.
 
 .PARAMETER LookbackHours
     Number of hours of time-based diagnostic data to collect. Defaults to 24.
@@ -46,11 +47,18 @@
 .PARAMETER OutputDirectory
     Directory in which the diagnostic ZIP archive is created.
 
+.PARAMETER ExtensiveTest
+    Collects per-logical-processor counters, a WPR CPU trace, and additional
+    native event logs.
+
 .EXAMPLE
     .\Collect-Windows-Diagnostics.ps1
 
 .EXAMPLE
     .\Collect-Windows-Diagnostics.ps1 -LookbackHours 168 -SamplingSeconds 300
+
+.EXAMPLE
+    .\Collect-Windows-Diagnostics.ps1 -SamplingSeconds 300 -ExtensiveTest
 
 .OUTPUTS
     Writes collection status and the final ZIP archive path to standard output.
@@ -60,6 +68,7 @@
     one diagnostic source is recorded without stopping the remaining collection.
     2026-08-25: Initial version of the script.
     2026-08-25: Added sampled performance, findings, storage health, and power diagnostics.
+    2026-09-15: Added extensive CPU tracing, WLAN reporting, and native event log exports.
 
 .LINK
     https://github.com/mennotech/rmm-scripts/blob/main/powershell/Collect-Windows-Diagnostics.ps1
@@ -80,7 +89,10 @@ param (
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$OutputDirectory = "C:\ProgramData\NinjaRMM-Diagnostics"
+    [string]$OutputDirectory = "C:\ProgramData\NinjaRMM-Diagnostics",
+
+    [Parameter()]
+    [switch]$ExtensiveTest
 )
 
 $ErrorActionPreference = "Stop"
@@ -105,6 +117,10 @@ if ($env:SamplingSeconds -and $env:SamplingSeconds -notlike "null") {
 
 if ($env:OutputDirectory -and $env:OutputDirectory -notlike "null") {
     $OutputDirectory = $env:OutputDirectory
+}
+
+if ($env:ExtensiveTest -and $env:ExtensiveTest -notlike "null") {
+    $ExtensiveTest = $env:ExtensiveTest -match '^(?i:true|1|yes|on)$'
 }
 
 function Test-IsElevated {
@@ -181,10 +197,15 @@ function Get-EventLogReport {
     $reportedEvents = $events | Where-Object { -not ($_.ProviderName -eq "Microsoft-Windows-DistributedCOM" -and $_.Id -eq 10016) }
 
     "=== EVENT SUMMARY ==="
-    $reportedEvents | Group-Object -Property LevelDisplayName, ProviderName, Id | ForEach-Object {
+    $reportedEvents | Group-Object -Property Level, ProviderName, Id | ForEach-Object {
         [PSCustomObject]@{
             Count     = $_.Count
-            Level     = $_.Group[0].LevelDisplayName
+            Level     = switch ($_.Group[0].Level) {
+                1 { "Critical" }
+                2 { "Error" }
+                3 { "Warning" }
+                default { "Level $($_.Group[0].Level)" }
+            }
             Provider  = $_.Group[0].ProviderName
             EventId   = $_.Group[0].Id
             Latest    = ($_.Group | Sort-Object -Property TimeCreated -Descending | Select-Object -First 1).TimeCreated
@@ -193,7 +214,7 @@ function Get-EventLogReport {
     "=== SUPPRESSED NOISE ==="
     "Suppressed $($suppressedEvents.Count) DistributedCOM event 10016 entries from the detailed report."
     "=== EVENT DETAILS ==="
-    $reportedEvents | Select-Object TimeCreated, Id, LevelDisplayName, ProviderName, MachineName, Message | Format-List
+    $reportedEvents | Select-Object TimeCreated, Id, Level, ProviderName, MachineName, Message | Format-List
 }
 
 $startTime = (Get-Date).AddHours(-$LookbackHours)
@@ -226,6 +247,7 @@ try {
             PowerShellVersion   = $PSVersionTable.PSVersion.ToString()
             RunningAsUser       = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
             RunningAsAdmin      = Test-IsElevated
+            ExtensiveTest       = [bool]$ExtensiveTest
         } | Format-List
     }
 
@@ -414,9 +436,26 @@ try {
             Format-Table -AutoSize
     }
 
+    Invoke-DiagnosticCollection -Name "wireless network report" -FileName "Wlan-Report.txt" -Collection {
+        $wlanReportSource = Join-Path -Path $env:ProgramData -ChildPath "Microsoft\Windows\WlanReport"
+        $wlanReportDestination = Join-Path -Path $script:CollectionDirectory -ChildPath "WlanReport"
+        & netsh.exe wlan show wlanreport 2>&1
+        if (Test-Path -LiteralPath $wlanReportSource) {
+            New-Item -Path $wlanReportDestination -ItemType Directory -Force | Out-Null
+            Copy-Item -Path (Join-Path -Path $wlanReportSource -ChildPath "*") -Destination $wlanReportDestination -Recurse -Force -ErrorAction Stop
+            "Copied WLAN report files to WlanReport."
+        } else {
+            "WLAN report directory was not created. The computer may not have an enabled WLAN adapter."
+        }
+    }
+
     Invoke-DiagnosticCollection -Name "sampled performance" -FileName "Performance.txt" -Collection {
         $counterPaths = @(
             "\Processor(_Total)\% Processor Time",
+            "\Processor(_Total)\% DPC Time",
+            "\Processor(_Total)\% Interrupt Time",
+            "\Processor(_Total)\DPC Rate",
+            "\Processor(_Total)\Interrupts/sec",
             "\System\Processor Queue Length",
             "\Memory\Available MBytes",
             "\Memory\% Committed Bytes In Use",
@@ -426,6 +465,13 @@ try {
             "\PhysicalDisk(_Total)\Current Disk Queue Length",
             "\PhysicalDisk(_Total)\Disk Bytes/sec"
         )
+        if ($ExtensiveTest) {
+            $counterPaths += @(
+                "\Processor(*)\% Processor Time",
+                "\Processor(*)\% DPC Time",
+                "\Processor(*)\% Interrupt Time"
+            )
+        }
         $logicalProcessorCount = [Environment]::ProcessorCount
         $sampleStarted = Get-Date
         $initialProcesses = @{}
@@ -433,7 +479,37 @@ try {
             $initialProcesses[$_.Id] = $_.CPU
         }
 
-        $counterData = Get-Counter -Counter $counterPaths -SampleInterval 1 -MaxSamples ($SamplingSeconds + 1)
+        $wprStarted = $false
+        $wprPath = Join-Path -Path $script:CollectionDirectory -ChildPath "CPU-Trace.etl"
+        if ($ExtensiveTest) {
+            try {
+                & wpr.exe -start CPU -filemode 2>&1 | Out-String | Write-Host
+                if ($LASTEXITCODE -eq 0) {
+                    $wprStarted = $true
+                } else {
+                    Write-Warning "WPR did not start; exit code $LASTEXITCODE."
+                }
+            } catch {
+                Write-Warning "WPR CPU trace could not be started. $($_.Exception.Message)"
+            }
+        }
+
+        try {
+            $counterData = Get-Counter -Counter $counterPaths -SampleInterval 1 -MaxSamples ($SamplingSeconds + 1)
+        } finally {
+            if ($wprStarted) {
+                try {
+                    & wpr.exe -stop $wprPath "NinjaOne extensive CPU diagnostic" 2>&1 | Out-String | Write-Host
+                    if ($LASTEXITCODE -ne 0) {
+                        Write-Warning "WPR stop returned exit code $LASTEXITCODE."
+                        & wpr.exe -cancel 2>&1 | Out-Null
+                    }
+                } catch {
+                    Write-Warning "WPR trace could not be saved. $($_.Exception.Message)"
+                    & wpr.exe -cancel 2>&1 | Out-Null
+                }
+            }
+        }
         $sampleEnded = Get-Date
         $actualSamplingSeconds = ($sampleEnded - $sampleStarted).TotalSeconds
         $finalProcesses = Get-Process -ErrorAction SilentlyContinue
@@ -566,6 +642,33 @@ try {
         Get-EventLogReport -LogName "Application" -StartTime $startTime
     }
 
+    Invoke-DiagnosticCollection -Name "raw Windows event logs" -FileName "EventLog-Export.txt" -Collection {
+        $eventLogDirectory = Join-Path -Path $script:CollectionDirectory -ChildPath "EventLogs"
+        New-Item -Path $eventLogDirectory -ItemType Directory -Force | Out-Null
+        $exports = @(
+            @{ Log = "System"; File = "System.evtx" },
+            @{ Log = "Application"; File = "Application.evtx" },
+            @{ Log = "Microsoft-Windows-WLAN-AutoConfig/Operational"; File = "WLAN-AutoConfig-Operational.evtx" }
+        )
+        if ($ExtensiveTest) {
+            $exports += @(
+                @{ Log = "Microsoft-Windows-TaskScheduler/Operational"; File = "TaskScheduler-Operational.evtx" },
+                @{ Log = "Microsoft-Windows-Kernel-PnP/Configuration"; File = "Kernel-PnP-Configuration.evtx" },
+                @{ Log = "Microsoft-Windows-BitLocker/BitLocker Management"; File = "BitLocker-Management.evtx" },
+                @{ Log = "Microsoft-Windows-BitLocker/BitLocker Operational"; File = "BitLocker-Operational.evtx" }
+            )
+        }
+        foreach ($export in $exports) {
+            $destination = Join-Path -Path $eventLogDirectory -ChildPath $export.File
+            & wevtutil.exe epl $export.Log $destination /ow:true 2>&1 | Out-String
+            if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $destination)) {
+                "Exported $($export.Log) to EventLogs\$($export.File)."
+            } else {
+                "Unable to export $($export.Log); exit code $LASTEXITCODE. The log may be disabled or unavailable."
+            }
+        }
+    }
+
     Invoke-DiagnosticCollection -Name "reliability events" -FileName "Reliability.txt" -Collection {
         Get-CimInstance -ClassName Win32_ReliabilityRecords |
             Where-Object { $_.TimeGenerated -ge $startTime } |
@@ -663,10 +766,15 @@ try {
             $findings | Sort-Object -Property @{ Expression = { $severityOrder[$_.Severity] } }, Area | Format-Table -AutoSize -Wrap
         }
         "=== EVENT SIGNATURES (DCOM 10016 EXCLUDED) ==="
-        $actionableEvents | Group-Object -Property LevelDisplayName, ProviderName, Id | ForEach-Object {
+        $actionableEvents | Group-Object -Property Level, ProviderName, Id | ForEach-Object {
             [PSCustomObject]@{
                 Count    = $_.Count
-                Level    = $_.Group[0].LevelDisplayName
+                Level    = switch ($_.Group[0].Level) {
+                    1 { "Critical" }
+                    2 { "Error" }
+                    3 { "Warning" }
+                    default { "Level $($_.Group[0].Level)" }
+                }
                 Provider = $_.Group[0].ProviderName
                 EventId  = $_.Group[0].Id
                 Latest   = ($_.Group | Sort-Object -Property TimeCreated -Descending | Select-Object -First 1).TimeCreated

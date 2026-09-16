@@ -936,7 +936,7 @@
   {
     "id": 122,
     "name": "Collect Windows Diagnostics",
-    "description": "Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\\ProgramData by default.\n\nNinjaRMM script form variables named LookbackHours, SamplingSeconds, and OutputDirectory can override the matching command-line parameters. Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).",
+    "description": "Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\\ProgramData by default.\n\nNinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, and ExtensiveTest can override the matching command-line parameters.",
     "active": true,
     "language": "powershell",
     "architecture": [
@@ -977,11 +977,21 @@
         "defaultValue": "",
         "required": false,
         "valueList": []
+      },
+      {
+        "id": "extensiveTest",
+        "name": "Extensive Test",
+        "description": "Collect per-processor counters, a WPR CPU trace, and additional native event logs.",
+        "type": "CHECKBOX",
+        "source": "LITERAL",
+        "defaultValue": "false",
+        "required": false,
+        "valueList": []
       }
     ],
     "createdBy": "Roland Penner",
-    "lastUpdatedBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Admin",
     "createdOn": 1787692195.258896,
-    "updatedOn": 1787695886.006747
+    "updatedOn": 1789530139.822248
   }
 ]
