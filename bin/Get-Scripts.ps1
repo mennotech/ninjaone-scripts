@@ -462,6 +462,7 @@ begin {
         }
         
         $header = @"
+$commentChar --- NINJAONE MANAGED HEADER START ---
 $commentChar ==============================================================================
 $commentChar Script Name: $($Script.name)
 $commentChar ==============================================================================
@@ -516,7 +517,8 @@ $commentChar   - Active: $($Script.active)
         
         $header += @"
 $commentChar ==============================================================================
-$commentChar
+$commentChar --- NINJAONE MANAGED HEADER END ---
+    $commentChar
 $commentChar INSTRUCTIONS FOR STUB FILES:
 $commentChar 1. Open NinjaOne GUI: https://$instance
 $commentChar 2. Navigate to: Administration → Library → Automation → Scripts

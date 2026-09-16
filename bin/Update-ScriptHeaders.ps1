@@ -65,11 +65,26 @@ begin {
         if ($Content -match 'NinjaOne Script ID:\s*(\d+)') { $existing.Id = [int]$matches[1] }
         if ($Content -match 'Last Updated:\s*([^\r\n]+)') { $existing.LastUpdated = $matches[1].Trim() }
         if ($Content -match 'Created On:\s*([^\r\n]+)') { $existing.CreatedOn = $matches[1].Trim() }
-        if ($Content -match 'Description:\s*\r?\n#\s+(.+?)(?:\r?\n#\s*\r?\n|\r?\n# Metadata:)') {
-            $existing.Description = $matches[1].Trim()
+        if ($Content -match "(?ms)^(?:#|REM|//|') Description:\r?\n(?<Description>.*?)\r?\n(?:#|REM|//|')\s*\r?\n(?:#|REM|//|') Metadata:") {
+            $existing.Description = (($matches.Description -split '\r?\n' | ForEach-Object {
+                ($_ -replace "^(?:#|REM|//|')\s*", '').Trim()
+            } | Where-Object { $_ }) -join "`n")
         }
 
         return $existing
+    }
+
+    function ConvertTo-NormalizedDescription {
+        param([AllowNull()][string]$Description)
+
+        $normalizedDescription = (($Description -replace '\\n', "`n") -split '[\r\n]+' |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ }) -join "`n"
+        if ($normalizedDescription) {
+            return $normalizedDescription
+        }
+
+        return "No description provided"
     }
 
     function New-ScriptStub {
@@ -125,6 +140,7 @@ begin {
         }
 
         $header = @"
+$commentChar --- NINJAONE MANAGED HEADER START ---
 $commentChar ==============================================================================
 $commentChar Script Name: $($ScriptMetadata.name)
 $commentChar ==============================================================================
@@ -182,7 +198,8 @@ $commentChar
 
         $header += @"
 $commentChar ==============================================================================
-$commentChar
+$commentChar --- NINJAONE MANAGED HEADER END ---
+    $commentChar
 $commentChar TODO: Paste script content from NinjaOne GUI here
 "@
 
@@ -286,6 +303,15 @@ end {
         $existing = Get-ExistingMetadata -Content $content
         $updateDate = [DateTimeOffset]::FromUnixTimeSeconds($scriptMeta.updatedOn).DateTime.ToString("yyyy-MM-dd HH:mm:ss")
         $createDate = [DateTimeOffset]::FromUnixTimeSeconds($scriptMeta.createdOn).DateTime.ToString("yyyy-MM-dd")
+        $metadataDescription = ConvertTo-NormalizedDescription -Description $scriptMeta.description
+        $hasManagedHeaderMarkers = $content -match "(?m)^(?:#|REM|//|') --- NINJAONE MANAGED HEADER START ---\r?$" -and
+            $content -match "(?m)^(?:#|REM|//|') --- NINJAONE MANAGED HEADER END ---\r?$"
+
+        if (-not $hasManagedHeaderMarkers) {
+            Write-Warning "Managed metadata header markers were not found in '$($file.FullName)'. Skipping to preserve script content."
+            $skippedCount++
+            continue
+        }
 
         # Determine if update is needed
         $needsUpdate = $false
@@ -302,6 +328,10 @@ end {
         elseif ($existing.LastUpdated -ne $updateDate) {
             $needsUpdate = $true
             $reason = "Metadata updated in NinjaOne"
+        }
+        elseif ($existing.Description -ne $metadataDescription) {
+            $needsUpdate = $true
+            $reason = "Description updated in NinjaOne"
         }
 
         if (-not $needsUpdate) {
@@ -335,6 +365,7 @@ end {
         }
 
         $header = @"
+$commentChar --- NINJAONE MANAGED HEADER START ---
 $commentChar ==============================================================================
 $commentChar Script Name: $($scriptMeta.name)
 $commentChar ==============================================================================
@@ -375,34 +406,45 @@ $commentChar   - Active: $($scriptMeta.active)
 
         $header += @"
 $commentChar ==============================================================================
+$commentChar --- NINJAONE MANAGED HEADER END ---
 
 "@
 
-        # Find where the actual code starts (first line that's not a comment or blank)
+        # Replace only the explicitly managed header.
         $lines = $content -split "`r?`n"
-        $codeStartIndex = 0
-        # List of all possible comment markers to check
-        $commentMarkers = @('#', 'REM', '//', "'")
-        for ($i = 0; $i -lt $lines.Count; $i++) {
-            $line = $lines[$i].Trim()
-            $isComment = $false
-            foreach ($marker in $commentMarkers) {
-                if ($line.StartsWith($marker)) {
-                    $isComment = $true
-                    break
-                }
+        $headerStartIndex = $null
+        $headerEndIndex = $null
+        for ($index = 0; $index -lt $lines.Count; $index++) {
+            if ($lines[$index].Trim() -match "^(?:#|REM|//|') --- NINJAONE MANAGED HEADER START ---$") {
+                $headerStartIndex = $index
             }
-            if ($line -and -not $isComment) {
-                $codeStartIndex = $i
+            elseif ($null -ne $headerStartIndex -and $lines[$index].Trim() -match "^(?:#|REM|//|') --- NINJAONE MANAGED HEADER END ---$") {
+                $headerEndIndex = $index
                 break
             }
         }
 
-        # Get the actual code (everything from first non-comment line)
-        $actualCode = $lines[$codeStartIndex..($lines.Count - 1)] -join "`n"
+        if ($null -eq $headerStartIndex -or $null -eq $headerEndIndex) {
+            Write-Warning "Could not identify the managed metadata header in '$($file.FullName)'. Skipping to preserve script comments."
+            $skippedCount++
+            continue
+        }
+
+        $prefix = if ($headerStartIndex -gt 0) {
+            ($lines[0..($headerStartIndex - 1)] -join "`n") + "`n"
+        } else { "" }
+        $codeStartIndex = $headerEndIndex + 1
+        while ($codeStartIndex -lt $lines.Count -and -not $lines[$codeStartIndex].Trim()) {
+            $codeStartIndex++
+        }
+
+        # Get the script-owned content, including comments and directives.
+        $actualCode = if ($codeStartIndex -lt $lines.Count) {
+            $lines[$codeStartIndex..($lines.Count - 1)] -join "`n"
+        } else { "" }
 
         # Combine new header with actual code
-        $newContent = $header + $actualCode
+        $newContent = $prefix + $header + $actualCode
 
         # Write back to file
         try {
