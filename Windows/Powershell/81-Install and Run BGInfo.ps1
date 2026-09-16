@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Install and Run BGInfo
 # ==============================================================================
@@ -19,6 +20,7 @@
 #   - configFilePathOrUrlLink (TEXT, Optional): Path to a BGInfo configuration file create with BGinfo.exe. Optionally you can specify an https url that points to a bgi config file to download.
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 2.0
 
 <#

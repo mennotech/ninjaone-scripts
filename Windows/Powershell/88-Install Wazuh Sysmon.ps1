@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Install Wazuh Sysmon
 # ==============================================================================
@@ -16,6 +17,7 @@
 #   - Last Updated: 2026-02-21 03:25:36
 #   - Active: True
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 if (Test-Path "C:\ProgramData\Wazuh-Sysmon") {
   Write-Host "Already installed, cancelling."
 } else {

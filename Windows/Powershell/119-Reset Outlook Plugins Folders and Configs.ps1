@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Reset Outlook Plugins Folders and Configs
 # ==============================================================================
@@ -15,8 +16,8 @@
 #   - Last Updated By: Roland Penner
 #   - Last Updated: 2026-05-20 15:37:53
 #   - Active: True
-#
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # Close Outlook if running
 Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue | ForEach-Object {
     $_.CloseMainWindow() | Out-Null

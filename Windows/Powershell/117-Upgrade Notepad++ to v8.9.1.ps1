@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Upgrade Notepad++ to v8.9.1
 # ==============================================================================
@@ -16,7 +17,7 @@
 #   - Last Updated: 2026-02-03 20:23:18
 #   - Active: True
 # ==============================================================================
-
+# --- NINJAONE MANAGED HEADER END ---
 # Requires: PowerShell 5+
 # Purpose : Uninstall existing Notepad++ and install v8.9.1 (x64) silently
 # Exit codes:

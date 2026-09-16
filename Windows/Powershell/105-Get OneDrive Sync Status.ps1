@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Get OneDrive Sync Status
 # ==============================================================================
@@ -24,6 +25,7 @@
 #     Default: false
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 <#
 .SYNOPSIS
     Retrieves the OneDrive sync status for all users currently running OneDrive on the local machine and optionally updates a specified RMM field with the results.

@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Find Large Folders
 # ==============================================================================
@@ -16,6 +17,7 @@
 #   - Last Updated: 2025-06-12 13:50:06
 #   - Active: True
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # INSTRUCTIONS:
 # 1. Open NinjaOne GUI: https://ca.ninjarmm.com
 # 2. Navigate to: Administration → Library → Automation → Scripts

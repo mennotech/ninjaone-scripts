@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Disable MOW File Zone Information
 # ==============================================================================
@@ -15,8 +16,8 @@
 #   - Last Updated By: Roland Penner
 #   - Last Updated: 2026-05-15 18:29:32
 #   - Active: True
-#
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 $path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments"
 
 # Ensure the key exists

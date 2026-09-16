@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: User Profile Size Report
 # ==============================================================================
@@ -23,6 +24,7 @@
 #     Default: TotalUsersProfileSizeDetail
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 5.1
 
 <#

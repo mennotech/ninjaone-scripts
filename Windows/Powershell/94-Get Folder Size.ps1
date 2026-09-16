@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Get Folder Size
 # ==============================================================================
@@ -22,6 +23,7 @@
 #     Default: true
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 <#
 .SYNOPSIS
     This script scans a specified folder and its subfolders, calculating the size of each subfolder and displaying the results in a table format.

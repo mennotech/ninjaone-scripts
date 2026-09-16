@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Uninstall NinjaOne Agent
 # ==============================================================================
@@ -16,6 +17,7 @@
 #   - Last Updated: 2025-04-28 21:03:48
 #   - Active: True
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # INSTRUCTIONS:
 # 1. Open NinjaOne GUI: https://ca.ninjarmm.com
 # 2. Navigate to: Administration → Library → Automation → Scripts

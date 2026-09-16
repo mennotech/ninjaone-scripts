@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Download and Install Wazuh Agent
 # ==============================================================================
@@ -20,6 +21,7 @@
 #     Default: wazuh-agent.menno.tech
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 2.0
 
 <#

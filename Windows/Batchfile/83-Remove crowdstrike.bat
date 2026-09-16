@@ -1,3 +1,4 @@
+REM --- NINJAONE MANAGED HEADER START ---
 REM ==============================================================================
 REM Script Name: Remove crowdstrike
 REM ==============================================================================
@@ -16,6 +17,7 @@ REM   - Last Updated By: Roland Penner
 REM   - Last Updated: 2025-04-17 14:08:06
 REM   - Active: True
 REM ==============================================================================
+REM --- NINJAONE MANAGED HEADER END ---
 REM INSTRUCTIONS:
 REM 1. Open NinjaOne GUI: https://ca.ninjarmm.com
 REM 2. Navigate to: Administration → Library → Automation → Scripts

@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Delete Windows User Profile
 # ==============================================================================
@@ -20,6 +21,7 @@
 #     Default: John
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 <#
 .SYNOPSIS
     This script removes a local copy of the user's profile directory and the corresponding registry entry.

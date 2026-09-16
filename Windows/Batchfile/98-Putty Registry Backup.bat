@@ -1,3 +1,4 @@
+REM --- NINJAONE MANAGED HEADER START ---
 REM ==============================================================================
 REM Script Name: Putty Registry Backup
 REM ==============================================================================
@@ -16,6 +17,7 @@ REM   - Last Updated By: Roland Penner
 REM   - Last Updated: 2025-06-04 17:53:42
 REM   - Active: True
 REM ==============================================================================
+REM --- NINJAONE MANAGED HEADER END ---
 REM INSTRUCTIONS:
 REM 1. Open NinjaOne GUI: https://ca.ninjarmm.com
 REM 2. Navigate to: Administration → Library → Automation → Scripts

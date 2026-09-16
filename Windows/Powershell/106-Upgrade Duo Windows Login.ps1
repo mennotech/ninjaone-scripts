@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Upgrade Duo Windows Login
 # ==============================================================================
@@ -16,6 +17,7 @@
 #   - Last Updated: 2025-07-17 21:26:59
 #   - Active: True
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 <#
 .SYNOPSIS
 This script downloads the latest Duo Windows Logon installer, extracts it, and installs it silently.

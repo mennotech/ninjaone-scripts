@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Download and Install SentinelOne
 # ==============================================================================
@@ -19,6 +20,7 @@
 #   - stoken (TEXT, Required): The SentinelOne Site Token
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # INSTRUCTIONS:
 # 1. Open NinjaOne GUI: https://ca.ninjarmm.com
 # 2. Navigate to: Administration → Library → Automation → Scripts

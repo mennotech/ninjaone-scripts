@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Clean up User Based CapsLockIndicator
 # ==============================================================================
@@ -16,7 +17,7 @@
 #   - Last Updated: 2026-02-21 03:12:30
 #   - Active: True
 # ==============================================================================
-
+# --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 5.1
 <#
 .SYNOPSIS

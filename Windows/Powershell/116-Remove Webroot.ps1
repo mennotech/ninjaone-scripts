@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Remove Webroot
 # ==============================================================================
@@ -16,6 +17,7 @@
 #   - Last Updated: 2025-12-24 19:38:28
 #   - Active: True
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # Removes Webroot SecureAnywhere by force
 # Run the script once in Safe Mode, then reboot
 

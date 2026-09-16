@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Set ShadowCopies MaxSize
 # ==============================================================================
@@ -22,6 +23,7 @@
 #     Default: C
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 <#
 .SYNOPSIS
     This script sets the maximum size for Windows Shadow Copies on a specified drive.

@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Delete Wi-Fi Profile
 # ==============================================================================
@@ -19,6 +20,7 @@
 #   - ssid (TEXT, Required): The SSID that you wish to delete
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 5.1
 
 <#

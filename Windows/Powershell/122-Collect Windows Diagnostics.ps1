@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Collect Windows Diagnostics
 # ==============================================================================
@@ -24,6 +25,9 @@
 #     Default: false
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
+#Requires -Version 5.1
+
 <#
 .SYNOPSIS
     Collects Windows diagnostic information and saves it as a ZIP archive.

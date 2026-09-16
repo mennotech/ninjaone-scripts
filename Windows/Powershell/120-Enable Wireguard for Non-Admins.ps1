@@ -1,3 +1,4 @@
+# --- NINJAONE MANAGED HEADER START ---
 # ==============================================================================
 # Script Name: Enable Wireguard for Non-Admins
 # ==============================================================================
@@ -15,11 +16,11 @@
 #   - Last Updated By: Roland Penner
 #   - Last Updated: 2026-07-31 18:25:59
 #   - Active: True
-#
 # Script Variables (NinjaOne):
 #   - wireguarduser (TEXT, Optional): The user to be given access to run WireGuard (domain\user)
 #
 # ==============================================================================
+# --- NINJAONE MANAGED HEADER END ---
 # NinjaOne Script Variable:
 # WireGuardUser
 # Example: CONTOSO\jdoe
