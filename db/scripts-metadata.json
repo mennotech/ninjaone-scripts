@@ -841,5 +841,147 @@
     "lastUpdatedBy": "Roland Penner",
     "createdOn": 1770150061.8784,
     "updatedOn": 1770150198.421953
+  },
+  {
+    "id": 118,
+    "name": "Disable MOW File Zone Information",
+    "description": "Disabled the Mark of Web or SaveZoneInformation configuration in windows through a registry entry",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": null,
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1778861627.483895,
+    "updatedOn": 1778869772.194696
+  },
+  {
+    "id": 119,
+    "name": "Reset Outlook Plugins Folders and Configs",
+    "description": "",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": null,
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1779291472.904535,
+    "updatedOn": 1779291472.904537
+  },
+  {
+    "id": 120,
+    "name": "Enable Wireguard for Non-Admins",
+    "description": "Give local users access to launch and run Wireguard. Note this grants all local users access to make system wide network changes.",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": [
+      {
+        "id": "wireguarduser",
+        "name": "WireGuardUser",
+        "description": "The user to be given access to run WireGuard (domain\\user)",
+        "type": "TEXT",
+        "source": "LITERAL",
+        "defaultValue": "",
+        "required": false,
+        "valueList": []
+      }
+    ],
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1785521500.383361,
+    "updatedOn": 1785522359.00395
+  },
+  {
+    "id": 121,
+    "name": "Store Bitlocker Recovery Key to NinjaOne",
+    "description": "",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": null,
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Admin",
+    "createdOn": 1786116318.288715,
+    "updatedOn": 1786121051.970739
+  },
+  {
+    "id": 122,
+    "name": "Collect Windows Diagnostics",
+    "description": "Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\\ProgramData by default.\n\nNinjaRMM script form variables named LookbackHours, SamplingSeconds, and OutputDirectory can override the matching command-line parameters. Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": [
+      {
+        "id": "lookbackhours",
+        "name": "LookbackHours",
+        "description": "Number of hours of time-based diagnostic data to collect. Defaults to 24.",
+        "type": "INTEGER",
+        "source": "LITERAL",
+        "defaultValue": "",
+        "required": false,
+        "valueList": []
+      },
+      {
+        "id": "outputdirectory",
+        "name": "OutputDirectory",
+        "description": "Directory in which the diagnostic ZIP archive is created.",
+        "type": "TEXT",
+        "source": "LITERAL",
+        "defaultValue": "",
+        "required": false,
+        "valueList": []
+      },
+      {
+        "id": "samplingseconds",
+        "name": "SamplingSeconds",
+        "description": "Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).",
+        "type": "INTEGER",
+        "source": "LITERAL",
+        "defaultValue": "",
+        "required": false,
+        "valueList": []
+      }
+    ],
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1787692195.258896,
+    "updatedOn": 1787695886.006747
   }
 ]

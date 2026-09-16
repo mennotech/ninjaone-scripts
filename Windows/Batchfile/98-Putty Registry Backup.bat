@@ -25,6 +25,15 @@ REM 5. Paste below this header (replace the placeholder comment)
 REM 6. Save and commit to Git
 REM ==============================================================================
 
-REM TODO: Paste script content from NinjaOne GUI here
+@ECHO OFF
 
+REM Default to exporting to Desktop folder
+SET EXPORTPATH="%USERPROFILE%\Desktop\Putty-Backup.reg"
+
+REM Override default if OneDrive environment variables are found
+IF DEFINED OneDrive (SET EXPORTPATH="%OneDrive%\Putty-Backup.reg")
+IF DEFINED OneDriveCommercial (SET EXPORTPATH="%OneDriveCommercial%\Putty-Backup.reg")
+
+ECHO Saving Putty configuration to %EXPORTPATH%
+REG EXPORT HKCU\Software\SimonTatham %EXPORTPATH% /y
 
