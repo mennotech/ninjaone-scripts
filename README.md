@@ -44,16 +44,16 @@ Synchronizes NinjaOne script metadata with your local repository and helps keep 
 **Usage:**
 ```powershell
 # Check what scripts exist in NinjaOne and export metadata
-.\Get-Scripts.ps1
+.\bin\Get-Scripts.ps1
 
 # Create stub files for new scripts with comprehensive headers
-.\Get-Scripts.ps1 -CreateStubs
+.\bin\Get-Scripts.ps1 -CreateStubs
 
 # Include disabled scripts in the sync
-.\Get-Scripts.ps1 -CreateStubs -IncludeDisabled
+.\bin\Get-Scripts.ps1 -CreateStubs -IncludeDisabled
 
 # Use custom output path and .env file
-.\Get-Scripts.ps1 -OutputPath "C:\NinjaScripts" -EnvFilePath "C:\Secure\.env"
+.\bin\Get-Scripts.ps1 -OutputPath "C:\NinjaScripts" -EnvFilePath "C:\Secure\.env"
 ```
 
 **Workflow:**
@@ -75,10 +75,11 @@ Synchronizes NinjaOne script metadata with your local repository and helps keep 
 - Files are named with format: `[ID]-[Script Name].[ext]` (e.g., `104-Block Windows Shell Extensions.ps1`)
 
 ### Update-ScriptHeaders.ps1
-Automatically updates metadata headers for scripts that have actual content (non-stub files).
+Automatically creates missing stubs and updates metadata headers for scripts that have actual content.
 
 **Features:**
 - Auto-discovers all script files in repository
+- Creates stub files for metadata entries without a corresponding local script
 - Matches files by Script ID (extracted from filename prefix)
 - Detects metadata changes by comparing timestamps
 - Renames files to match current script name in NinjaOne (preserves ID prefix)
@@ -93,10 +94,10 @@ Automatically updates metadata headers for scripts that have actual content (non
 **Usage:**
 ```powershell
 # Update headers for all scripts with content
-.\Update-ScriptHeaders.ps1
+.\bin\Update-ScriptHeaders.ps1
 
 # Run with verbose output to see what's being processed
-.\Update-ScriptHeaders.ps1 -Verbose
+.\bin\Update-ScriptHeaders.ps1 -Verbose
 ```
 
 **When to Run:**
@@ -122,12 +123,12 @@ Scripts are automatically named using the format: `[ID]-[Script Name].[extension
 ### Initial Setup
 1. Create NinjaOne API credentials (Administration > Apps > API)
 2. Copy `.env.example` to `.env` and configure credentials
-3. Run `.\Get-Scripts.ps1 -CreateStubs` to initialize repository
+3. Run `.\bin\Get-Scripts.ps1 -CreateStubs` to initialize repository
 
 ### Regular Sync Process
 ```powershell
 # Step 1: Sync metadata and create stub files for new scripts
-.\Get-Scripts.ps1 -CreateStubs
+.\bin\Get-Scripts.ps1 -CreateStubs
 
 # Step 2: Review SYNC-REPORT.md for new/updated scripts
 
@@ -138,7 +139,7 @@ Scripts are automatically named using the format: `[ID]-[Script Name].[extension
 #   - Paste into the corresponding stub file (replacing the TODO comment)
 
 # Step 4: Update headers for newly populated scripts
-.\Update-ScriptHeaders.ps1
+.\bin\Update-ScriptHeaders.ps1
 
 # Step 5: Review changes and commit to Git
 git add .
@@ -149,10 +150,10 @@ git push
 ### When Scripts are Renamed in NinjaOne
 ```powershell
 # Step 1: Refresh metadata
-.\Get-Scripts.ps1
+.\bin\Get-Scripts.ps1
 
 # Step 2: Update headers (automatically detects and renames files)
-.\Update-ScriptHeaders.ps1
+.\bin\Update-ScriptHeaders.ps1
 
 # The script will:
 # - Detect the rename via Script ID
@@ -164,8 +165,8 @@ git push
 ### Periodic Maintenance
 Run these commands weekly or after making changes in NinjaOne:
 ```powershell
-.\Get-Scripts.ps1 -CreateStubs  # Refresh metadata, create stubs for new scripts
-.\Update-ScriptHeaders.ps1       # Update headers for changed metadata
+.\bin\Get-Scripts.ps1            # Refresh metadata
+.\bin\Update-ScriptHeaders.ps1   # Create missing stubs and update changed headers
 ```
 
 ## Folder Structure
