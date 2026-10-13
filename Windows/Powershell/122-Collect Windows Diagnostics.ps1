@@ -5,7 +5,7 @@
 #
 # Description:
 #   Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\ProgramData by default.
-#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, and ExtensiveTest can override the matching command-line parameters.
+#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, ExtensiveTest, and DisableSecurityLogs can override the matching command-line parameters.
 #
 # Metadata:
 #   - NinjaOne Script ID: 122
@@ -23,6 +23,8 @@
 #   - samplingseconds (INTEGER, Optional): Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).
 #   - extensiveTest (CHECKBOX, Optional): Collect per-processor counters, a WPR CPU trace, and additional native event logs.
 #     Default: false
+#   - disableSecurityLogs (CHECKBOX, Optional): Skip security-related native event log exports.
+#     Default: false
 #
 # ==============================================================================
 # --- NINJAONE MANAGED HEADER END ---
@@ -38,8 +40,17 @@
     24 hours. The output is written beneath C:\ProgramData by default.
 
     NinjaRMM script form variables named LookbackHours, SamplingSeconds,
-    OutputDirectory, and ExtensiveTest can override the matching command-line
-    parameters.
+    OutputDirectory, ExtensiveTest, and DisableSecurityLogs can override the
+    matching command-line parameters.
+
+    Security, PowerShell Operational, Task Scheduler Operational, Defender
+    Operational, and Sysmon Operational event logs are exported by default
+    alongside the existing diagnostic logs. Unavailable or inaccessible logs
+    are reported in EventLog-Export.txt without stopping the remaining exports.
+    The collector does not install Sysmon or enable logging.
+
+    Security logs may contain sensitive account details and command lines.
+    Restrict access to the resulting archive.
 
 .PARAMETER LookbackHours
     Number of hours of time-based diagnostic data to collect. Defaults to 24.
@@ -55,6 +66,11 @@
     Collects per-logical-processor counters, a WPR CPU trace, and additional
     native event logs.
 
+.PARAMETER DisableSecurityLogs
+    String boolean that skips Security, PowerShell Operational, Task Scheduler
+    Operational, Defender Operational, and Sysmon Operational log exports when
+    true. Defaults to false. Unavailable logs are reported without enabling them.
+
 .EXAMPLE
     .\Collect-Windows-Diagnostics.ps1
 
@@ -64,15 +80,25 @@
 .EXAMPLE
     .\Collect-Windows-Diagnostics.ps1 -SamplingSeconds 300 -ExtensiveTest
 
+.EXAMPLE
+    & ".\Windows\Powershell\122-Collect Windows Diagnostics.ps1" -DisableSecurityLogs true
+
 .OUTPUTS
     Writes collection status and the final ZIP archive path to standard output.
 
 .NOTES
-    Run as an administrator for access to all diagnostic sources. A failure in
-    one diagnostic source is recorded without stopping the remaining collection.
+    Requires PowerShell 5.1 or higher. Run as an administrator for access to all
+    diagnostic sources. A failure in one diagnostic source is recorded without
+    stopping the remaining collection.
+
+    In NinjaOne, add a DisableSecurityLogs checkbox script variable with a
+    default of false. Its environment value overrides the command-line
+    parameter. Set it to true to skip security-related event log exports.
+
     2026-08-25: Initial version of the script.
     2026-08-25: Added sampled performance, findings, storage health, and power diagnostics.
     2026-09-15: Added extensive CPU tracing, WLAN reporting, and native event log exports.
+    2026-10-13: Fixed storage event provider filtering and enabled security log exports with an opt-out.
 
 .LINK
     https://github.com/mennotech/rmm-scripts/blob/main/powershell/Collect-Windows-Diagnostics.ps1
@@ -96,7 +122,11 @@ param (
     [string]$OutputDirectory = "C:\ProgramData\NinjaRMM-Diagnostics",
 
     [Parameter()]
-    [switch]$ExtensiveTest
+    [switch]$ExtensiveTest,
+
+    [Parameter()]
+    [ValidateSet("true", "false", "1", "0", "yes", "no", "on", "off")]
+    [string]$DisableSecurityLogs = "false"
 )
 
 $ErrorActionPreference = "Stop"
@@ -126,6 +156,15 @@ if ($env:OutputDirectory -and $env:OutputDirectory -notlike "null") {
 if ($env:ExtensiveTest -and $env:ExtensiveTest -notlike "null") {
     $ExtensiveTest = $env:ExtensiveTest -match '^(?i:true|1|yes|on)$'
 }
+
+if ($env:DisableSecurityLogs -and $env:DisableSecurityLogs -notlike "null") {
+    if ($env:DisableSecurityLogs -notmatch '^(?i:true|false|1|0|yes|no|on|off)$') {
+        Write-Error "DisableSecurityLogs must be true, false, 1, 0, yes, no, on, or off."
+        exit 1
+    }
+    $DisableSecurityLogs = $env:DisableSecurityLogs
+}
+$securityLogsDisabled = $DisableSecurityLogs -match '^(?i:true|1|yes|on)$'
 
 function Test-IsElevated {
     $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -654,9 +693,19 @@ try {
             @{ Log = "Application"; File = "Application.evtx" },
             @{ Log = "Microsoft-Windows-WLAN-AutoConfig/Operational"; File = "WLAN-AutoConfig-Operational.evtx" }
         )
+        if (-not $securityLogsDisabled) {
+            $exports += @(
+                @{ Log = "Security"; File = "Security.evtx" },
+                @{ Log = "Microsoft-Windows-PowerShell/Operational"; File = "PowerShell-Operational.evtx" },
+                @{ Log = "Microsoft-Windows-TaskScheduler/Operational"; File = "TaskScheduler-Operational.evtx" },
+                @{ Log = "Microsoft-Windows-Windows Defender/Operational"; File = "Defender-Operational.evtx" },
+                @{ Log = "Microsoft-Windows-Sysmon/Operational"; File = "Sysmon-Operational.evtx" }
+            )
+        } else {
+            "Security-related event log exports were disabled by DisableSecurityLogs."
+        }
         if ($ExtensiveTest) {
             $exports += @(
-                @{ Log = "Microsoft-Windows-TaskScheduler/Operational"; File = "TaskScheduler-Operational.evtx" },
                 @{ Log = "Microsoft-Windows-Kernel-PnP/Configuration"; File = "Kernel-PnP-Configuration.evtx" },
                 @{ Log = "Microsoft-Windows-BitLocker/BitLocker Management"; File = "BitLocker-Management.evtx" },
                 @{ Log = "Microsoft-Windows-BitLocker/BitLocker Operational"; File = "BitLocker-Operational.evtx" }
@@ -664,11 +713,15 @@ try {
         }
         foreach ($export in $exports) {
             $destination = Join-Path -Path $eventLogDirectory -ChildPath $export.File
-            & wevtutil.exe epl $export.Log $destination /ow:true 2>&1 | Out-String
-            if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $destination)) {
-                "Exported $($export.Log) to EventLogs\$($export.File)."
-            } else {
-                "Unable to export $($export.Log); exit code $LASTEXITCODE. The log may be disabled or unavailable."
+            try {
+                & wevtutil.exe epl $export.Log $destination /ow:true 2>&1 | Out-String
+                if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $destination)) {
+                    "Exported $($export.Log) to EventLogs\$($export.File)."
+                } else {
+                    "Unable to export $($export.Log); exit code $LASTEXITCODE. The log may be disabled, unavailable, or inaccessible."
+                }
+            } catch {
+                "Unable to export $($export.Log). $($_.Exception.Message)"
             }
         }
     }
@@ -744,7 +797,7 @@ try {
         }
         $actionableEvents = $events | Where-Object { -not ($_.ProviderName -eq "Microsoft-Windows-DistributedCOM" -and $_.Id -eq 10016) }
         $storageEvents = $actionableEvents | Where-Object {
-            $_.ProviderName -match "^(disk|Ntfs|exfat|stornvme|storahci)$" -or $_.Id -in 51, 55, 129, 141, 153, 157
+            $_.ProviderName -match "^(disk|Ntfs|Microsoft-Windows-Ntfs|exfat|stornvme|storahci|storport|Microsoft-Windows-StorPort)$"
         }
         if ($storageEvents) {
             $findings.Add([PSCustomObject]@{ Severity = "High"; Area = "Storage"; Finding = "$($storageEvents.Count) storage warning or error events were recorded during the lookback period." })
