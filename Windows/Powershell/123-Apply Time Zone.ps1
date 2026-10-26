@@ -14,9 +14,8 @@
 #   - Created By: Roland Admin
 #   - Created On: 2026-10-23
 #   - Last Updated By: Roland Admin
-#   - Last Updated: 2026-10-23 14:36:18
+#   - Last Updated: 2026-10-23 14:43:43
 #   - Active: True
-#
 # Script Variables (NinjaOne):
 #   - timeZone (TEXT, Optional): The windows timezone to set on the system
 #     Default: Manitoba Standard Time

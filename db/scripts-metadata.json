@@ -1033,6 +1033,27 @@
     "createdBy": "Roland Admin",
     "lastUpdatedBy": "Roland Admin",
     "createdOn": 1792766177.928252,
-    "updatedOn": 1792766177.928253
+    "updatedOn": 1792766623.297483
+  },
+  {
+    "id": 124,
+    "name": "Linux Time Zone DB Lookup Debian",
+    "description": "This script looks up the Time Zone database version and system Time Zone configuration. It will also apply the passed in Time Zone to the system.",
+    "active": true,
+    "language": "sh",
+    "architecture": [
+      "64"
+    ],
+    "operatingSystems": [
+      "Linux"
+    ],
+    "scriptParameters": [
+      "timezone"
+    ],
+    "scriptVariables": null,
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1793030032.439719,
+    "updatedOn": 1793030032.439721
   }
 ]
