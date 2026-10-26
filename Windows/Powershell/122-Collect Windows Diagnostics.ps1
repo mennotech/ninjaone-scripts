@@ -5,7 +5,7 @@
 #
 # Description:
 #   Collects system, storage, networking, service, process, update, security, and Windows event log information. Time-based data defaults to the previous 24 hours. The output is written beneath C:\ProgramData by default.
-#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, ExtensiveTest, and DisableSecurityLogs can override the matching command-line parameters.
+#   NinjaRMM script form variables named LookbackHours, SamplingSeconds, OutputDirectory, and ExtensiveTest can override the matching command-line parameters.
 #
 # Metadata:
 #   - NinjaOne Script ID: 122
@@ -14,8 +14,8 @@
 #   - Architecture: 64, 32
 #   - Created By: Roland Penner
 #   - Created On: 2026-08-25
-#   - Last Updated By: Roland Admin
-#   - Last Updated: 2026-09-16 03:42:20
+#   - Last Updated By: Roland Penner
+#   - Last Updated: 2026-10-13 20:01:37
 #   - Active: True
 # Script Variables (NinjaOne):
 #   - lookbackhours (INTEGER, Optional): Number of hours of time-based diagnostic data to collect. Defaults to 24.
@@ -23,7 +23,7 @@
 #   - samplingseconds (INTEGER, Optional): Number of seconds to sample performance counters. Defaults to 60 and may be set as high as 900 seconds (15 minutes).
 #   - extensiveTest (CHECKBOX, Optional): Collect per-processor counters, a WPR CPU trace, and additional native event logs.
 #     Default: false
-#   - disableSecurityLogs (CHECKBOX, Optional): Skip security-related native event log exports.
+#   - disablesecuritylogs (CHECKBOX, Optional): Skip security-related native event log exports.
 #     Default: false
 #
 # ==============================================================================

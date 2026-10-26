@@ -987,11 +987,52 @@
         "defaultValue": "false",
         "required": false,
         "valueList": []
+      },
+      {
+        "id": "disablesecuritylogs",
+        "name": "disableSecurityLogs",
+        "description": "Skip security-related native event log exports.",
+        "type": "CHECKBOX",
+        "source": "LITERAL",
+        "defaultValue": "false",
+        "required": false,
+        "valueList": []
       }
     ],
     "createdBy": "Roland Penner",
-    "lastUpdatedBy": "Roland Admin",
+    "lastUpdatedBy": "Roland Penner",
     "createdOn": 1787692195.258896,
-    "updatedOn": 1789530139.822248
+    "updatedOn": 1791921697.102184
+  },
+  {
+    "id": 123,
+    "name": "Apply Time Zone",
+    "description": "Configures a specified time zone to the system",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64",
+      "32"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": [
+      {
+        "id": "timeZone",
+        "name": "Time Zone",
+        "description": "The windows timezone to set on the system",
+        "type": "TEXT",
+        "source": "LITERAL",
+        "defaultValue": "Manitoba Standard Time",
+        "required": false,
+        "valueList": []
+      }
+    ],
+    "createdBy": "Roland Admin",
+    "lastUpdatedBy": "Roland Admin",
+    "createdOn": 1792766177.928252,
+    "updatedOn": 1792766177.928253
   }
 ]
