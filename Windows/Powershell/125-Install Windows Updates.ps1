@@ -14,9 +14,8 @@
 #   - Created By: Roland Penner
 #   - Created On: 2026-10-27
 #   - Last Updated By: Roland Penner
-#   - Last Updated: 2026-10-27 14:14:14
+#   - Last Updated: 2026-10-27 14:26:43
 #   - Active: True
-#
 # ==============================================================================
 # --- NINJAONE MANAGED HEADER END ---
 #Requires -Version 5.1
