@@ -14,12 +14,8 @@
 #   - Created By: Roland Penner
 #   - Created On: 2026-10-26
 #   - Last Updated By: Roland Penner
-#   - Last Updated: 2026-10-26 15:53:52
+#   - Last Updated: 2026-10-26 16:31:17
 #   - Active: True
-#
-# Script Parameters:
-#   - : 
-#
 # ==============================================================================
 # --- NINJAONE MANAGED HEADER END ---
 #!/bin/sh

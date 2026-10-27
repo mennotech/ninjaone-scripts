@@ -1037,7 +1037,7 @@
   },
   {
     "id": 124,
-    "name": "Linux Time Zone DB Lookup Debian",
+    "name": "Linux Time Zone",
     "description": "This script looks up the Time Zone database version and system Time Zone configuration. It will also apply the passed in Time Zone to the system.",
     "active": true,
     "language": "sh",
@@ -1054,6 +1054,25 @@
     "createdBy": "Roland Penner",
     "lastUpdatedBy": "Roland Penner",
     "createdOn": 1793030032.439719,
-    "updatedOn": 1793030032.439721
+    "updatedOn": 1793032277.456687
+  },
+  {
+    "id": 125,
+    "name": "Install Windows Updates",
+    "description": "This script scans for available Windows Updates and then installs non optional updates.",
+    "active": true,
+    "language": "powershell",
+    "architecture": [
+      "64"
+    ],
+    "operatingSystems": [
+      "Windows"
+    ],
+    "scriptParameters": [],
+    "scriptVariables": null,
+    "createdBy": "Roland Penner",
+    "lastUpdatedBy": "Roland Penner",
+    "createdOn": 1793110341.096072,
+    "updatedOn": 1793110453.704776
   }
 ]
